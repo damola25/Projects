@@ -1,11 +1,8 @@
 package com.jadeapps.bubbleapplication;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -19,33 +16,20 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-public class TwoDCustomView extends View implements SensorEventListener  {
+public class TwoDCustomView extends View implements SensorEventListener {
 
     private static final String TAG = "TwoDCustomView";
     private final int padX2 = 100;
     private final int padY = 20;
-
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
-
     private SensorEvent[] accelerometerSensorDataLogger;
+
+    Paint redPaint;
 
     private int customViewWidth;
     private int customViewHeight;
     private int xPadWidth, twoDRectangleWidth, twoDRectangleHeight;
-
-    Paint redPaint, bubblePaint;
-
-    static private final double GRAVITY = 9.81d;
-    static private final double MIN_DEGREE = -10d;
-    static private final double MAX_DEGREE = 10d;
-
-
-    private Rect twoDRectangle;
-    private Paint twoDRectanglePaint;
-    private Bitmap twoDRectangleBitmap;
-
-    private double angleInDegreesXAxis, angleInDegreesYAxis;
 
     private Integer twoDPlaneLength;
 
@@ -68,15 +52,12 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
-
         if (width > height) {
             Integer half = (Integer) width/2;
-            customViewWidth = half;
-            customViewHeight = height;
+            twoDRectangleWidth = half - padX2;
             xPadWidth =  ((Integer) ((half - twoDRectangleWidth)/2));
         } else if (width < height) {
-            customViewWidth = width - padX2;
-            customViewHeight = (Integer) height/2;
+            twoDRectangleWidth = width - padX2;
             xPadWidth =  ((Integer) ((width - twoDRectangleWidth)/2));
         }
 
@@ -93,34 +74,15 @@ public class TwoDCustomView extends View implements SensorEventListener  {
             Log.d(TAG, "init: Accelerometer NOT supported on this device!!!");
             Toast.makeText(getContext(), "Accelerometer NOT supported on this device!!!", Toast.LENGTH_LONG).show();
         }
-
         accelerometerSensorDataLogger = new SensorEvent[]{};
 
-        twoDRectangleBitmap = Bitmap.createBitmap(
-                customViewWidth, // Width
-                customViewHeight, // Height
-                Bitmap.Config.ARGB_8888 // Config
-        );
-
         twoDPlaneLength = (Integer) width/6;
-        twoDRectangle = new Rect(twoDPlaneLength, 50, ((twoDPlaneLength*4)+twoDPlaneLength), ((twoDPlaneLength*4)+twoDPlaneLength));
-
-        twoDRectanglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        twoDRectanglePaint.setStyle(Paint.Style.FILL);
-        twoDRectanglePaint.setColor(Color.YELLOW);
 
         redPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         redPaint.setColor(this.getResources().getColor(R.color.design_default_color_error));
         redPaint.setTextAlign(Paint.Align.CENTER);
         redPaint.setTextSize(50f);
         redPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-
-        bubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        bubblePaint.setStyle(Paint.Style.FILL);
-        bubblePaint.setColor(Color.GREEN);
-
-        angleInDegreesXAxis = 0d;
-        angleInDegreesYAxis = 0d;
     }
 
     @Override
@@ -129,7 +91,6 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         int width = getMeasuredWidth();
         int height = getMeasuredHeight();
         Integer half = 0;
-
         if (width > height) {
             half = (Integer) width/2;
             customViewWidth = half;
@@ -147,25 +108,7 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawRect(twoDRectangle, twoDRectanglePaint);
-
-        canvas.drawLine(computeLineLocationOnCustomViewY(MAX_DEGREE), 50, computeLineLocationOnCustomViewY(MAX_DEGREE), ((twoDPlaneLength*4)+twoDPlaneLength), redPaint);
-        canvas.drawLine(computeLineLocationOnCustomViewY(MIN_DEGREE), 50, computeLineLocationOnCustomViewY(MIN_DEGREE), ((twoDPlaneLength*4)+twoDPlaneLength), redPaint);
-
-        canvas.drawLine(twoDPlaneLength, computeLineLocationOnCustomViewX(MAX_DEGREE),  ((twoDPlaneLength*4)+twoDPlaneLength), computeLineLocationOnCustomViewX(MAX_DEGREE), redPaint);
-        canvas.drawLine(twoDPlaneLength, computeLineLocationOnCustomViewX(MIN_DEGREE),  ((twoDPlaneLength*4)+twoDPlaneLength), computeLineLocationOnCustomViewX(MIN_DEGREE), redPaint);
-
-        canvas.drawCircle(computeLineLocationOnCustomViewY(angleInDegreesYAxis), computeLineLocationOnCustomViewX(angleInDegreesXAxis), (twoDRectangleHeight/3), bubblePaint);
-    }
-
-    private int computeLineLocationOnCustomViewX(double angle){
-        Double value =  ( - angle + 180d) * 2.1d;
-        return value.intValue();
-    }
-
-    private int computeLineLocationOnCustomViewY(double angle){
-        Double value =  ( - angle + 260d) * 2.1d;
-        return value.intValue();
+        canvas.drawText("2D Custom View", twoDPlaneLength*3, 100, redPaint);
     }
 
     @Override
@@ -173,21 +116,9 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         Sensor sensor = sensorEvent.sensor;
 
         if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            Log.d(TAG, "onSensorChanged: ACCELEROMETER sensor data has been updated ...");
             accelerometerSensorDataLogger = updateSensorDataLoggerInstance(accelerometerSensorDataLogger.length, accelerometerSensorDataLogger, sensorEvent);
+            Log.d(TAG, "onSensorChanged: Custom View 2D ACCELEROMETER sensor data length " + accelerometerSensorDataLogger.length);
         }
-
-        double gravityXCoords = sensorEvent.values[0] > GRAVITY ? GRAVITY : sensorEvent.values[0];
-        double gravityYCoords = sensorEvent.values[1] > GRAVITY ? GRAVITY : sensorEvent.values[1];
-        double gravityZCoords = sensorEvent.values[2];
-
-        gravityXCoords = gravityXCoords < -GRAVITY ? -GRAVITY : gravityXCoords;
-        gravityYCoords = gravityYCoords < -GRAVITY ? -GRAVITY : gravityYCoords;
-
-        angleInDegreesXAxis = Math.toDegrees(Math.asin(gravityYCoords/GRAVITY));
-        angleInDegreesYAxis = Math.toDegrees(Math.asin(gravityXCoords/GRAVITY));
-
-        invalidate();
     }
 
     private SensorEvent[] updateSensorDataLoggerInstance(int loggerLength, SensorEvent[] selectedSensorDataLogger, SensorEvent event) {
