@@ -4,34 +4,86 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView orientationStatusTextView;
+    OneDCustomView oneDCustomView;
+    TwoDCustomView twoDCustomView;
+
+    LinearLayout customViewLinearLayout, informationLinearLayout;
+
+    String screenOrientation;
+
+    RelativeLayout.LayoutParams oneDCustomViewRelative =  new RelativeLayout.LayoutParams(
+        RelativeLayout.LayoutParams.WRAP_CONTENT,
+        RelativeLayout.LayoutParams.WRAP_CONTENT
+    );
+
+    RelativeLayout.LayoutParams twoDCustomViewRelative =  new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+    );
+
+    LinearLayout.LayoutParams  params;
+
+    int width;
+    int height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        orientationStatusTextView = findViewById(R.id.orientationStatusTextView);
+        oneDCustomView = (OneDCustomView) findViewById(R.id.oneDCustomView);
+        twoDCustomView = (TwoDCustomView) findViewById(R.id.twoDCustomView);
+
+        customViewLinearLayout = (LinearLayout) findViewById(R.id.customViewLinearLayout);
+        informationLinearLayout = (LinearLayout) findViewById(R.id.informationLinearLayout);
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        width = displayMetrics.widthPixels;
+        height = displayMetrics.heightPixels;
+
+        System.out.println(String.format("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000>>>          Start Margin value %s", oneDCustomViewRelative.getMarginStart()));
+        System.out.println(String.format("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000>>>          End Margin value %s", oneDCustomViewRelative.getMarginEnd()));
+
 
         int orientation = getResources().getConfiguration().orientation;
-        switch (orientation)
-        {
+        switch (orientation) {
             case Configuration.ORIENTATION_UNDEFINED:
-                orientationStatusTextView.setText("Screen Orientation: \n Undefined!!!.");
+                screenOrientation = "Undefined";
                 break;
             case Configuration.ORIENTATION_LANDSCAPE:
-                orientationStatusTextView.setText("Screen Orientation: \n Landscape.");
+                screenOrientation = "Landscape";
+//                try {
+//                    oneDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+//                    twoDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//                } catch (Exception ex) {}
+//                twoDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//                oneDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+//                oneDCustomView.setLayoutParams(oneDCustomViewRelative);
+//                twoDCustomView.setLayoutParams(twoDCustomViewRelative);
                 break;
             case Configuration.ORIENTATION_PORTRAIT:
-                orientationStatusTextView.setText("Screen Orientation: \n Portrait.");
+                screenOrientation = "Portrait";
+//                try {
+//                    oneDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+//                    twoDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//                } catch (Exception ex) {}
+//                twoDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//                oneDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+//                oneDCustomView.setLayoutParams(oneDCustomViewRelative);
+//                twoDCustomView.setLayoutParams(twoDCustomViewRelative);
                 break;
             default:
-                orientationStatusTextView.setText("Screen Orientation: \n Square.");
+                screenOrientation = "Square";
                 break;
         }
     }
@@ -42,9 +94,25 @@ public class MainActivity extends AppCompatActivity {
 
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            orientationStatusTextView.setText("Screen Orientation: \n Landscape.");
+            screenOrientation = "Landscape";
+            try {
+                oneDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+                twoDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            } catch (Exception ex) {}
+            twoDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            oneDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            customViewLinearLayout.setLayoutParams(oneDCustomViewRelative);
+            informationLinearLayout.setLayoutParams(twoDCustomViewRelative);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            orientationStatusTextView.setText("Screen Orientation: \n Portrait.");
+            screenOrientation = "Portrait";
+            try {
+                oneDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                twoDCustomViewRelative.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            } catch (Exception ex) {}
+            twoDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            oneDCustomViewRelative.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            customViewLinearLayout.setLayoutParams(oneDCustomViewRelative);
+            informationLinearLayout.setLayoutParams(twoDCustomViewRelative);
         }
     }
 }
