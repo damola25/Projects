@@ -45,6 +45,10 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     private Paint twoDRectanglePaint;
     private Bitmap twoDRectangleBitmap;
 
+    private int screenWidth = 0;
+
+    private int rotationAngle;
+
     private double angleInDegreesXAxis, angleInDegreesYAxis, minXValue, maxXValue, minYValue, maxYValue;
 
     private Integer twoDPlaneLength;
@@ -68,6 +72,7 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
+        screenWidth = width;
 
         if (width > height) {
             Integer half = (Integer) width/2;
@@ -81,6 +86,7 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         }
 
         twoDRectangleHeight = 100;
+        rotationAngle = 0;
 
         Log.d(TAG, "init: Initializing Sensor Services");
         sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
@@ -107,12 +113,13 @@ public class TwoDCustomView extends View implements SensorEventListener  {
 
         twoDRectanglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         twoDRectanglePaint.setStyle(Paint.Style.FILL);
-        twoDRectanglePaint.setColor(Color.YELLOW);
+        twoDRectanglePaint.setColor(Color.BLACK);
 
         redPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        redPaint.setColor(this.getResources().getColor(R.color.design_default_color_error));
+        redPaint.setColor(Color.RED);
         redPaint.setTextAlign(Paint.Align.CENTER);
         redPaint.setTextSize(50f);
+        redPaint.setStrokeWidth(getContext().getResources().getDisplayMetrics().density * 2);
         redPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         bubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -138,11 +145,11 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         if (width > height) {
             half = (Integer) width/2;
             customViewWidth = half;
-            customViewHeight = height-150;
+            customViewHeight = height- 50;
             setMeasuredDimension(half, customViewHeight);
         } else {
             half = (Integer) height/2;
-            customViewHeight = half - 150;
+            customViewHeight = half - 50;
             customViewWidth = width;
             setMeasuredDimension(width, customViewHeight);
         }
@@ -152,10 +159,33 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawRect(twoDRectangle, twoDRectanglePaint);
+//        canvas.drawRect(twoDRectangle, twoDRectanglePaint);
 
-        canvas.drawLine(computeLineLocationOnCustomViewY(MAX_DEGREE), 50, computeLineLocationOnCustomViewY(MAX_DEGREE), ((twoDPlaneLength*4)+twoDPlaneLength), redPaint);
-        canvas.drawLine(computeLineLocationOnCustomViewY(MIN_DEGREE), 50, computeLineLocationOnCustomViewY(MIN_DEGREE), ((twoDPlaneLength*4)+twoDPlaneLength), redPaint);
+        int radius = (Integer)(((twoDPlaneLength*4))/2);
+        canvas.drawCircle((twoDPlaneLength+radius), (50+radius), radius, twoDRectanglePaint);
+        canvas.save();
+        canvas.rotate(rotationAngle, (twoDPlaneLength+radius), (50+radius));
+
+        int textWidth = (int)redPaint.measureText("N");
+        int textHeight = (int)redPaint.measureText("yY");
+        int halfScreenWidth = (twoDPlaneLength + 3 + ((Integer)(twoDPlaneLength*4)/2));
+        int halfScreenTop = -20;
+
+        for (int i = 0; i < 24; i++) {
+            canvas.translate(0, textHeight);
+            if (i % 6 == 0) {
+                String dirString = "";
+                switch (i) {
+                    case(0) : dirString = "N"; break;
+                    default:  dirString = "";  break;
+                }
+                canvas.drawText(dirString, halfScreenWidth, halfScreenTop, redPaint);
+            }
+            canvas.rotate(15, (twoDPlaneLength+radius), (50+radius));
+        }
+
+        canvas.drawLine(computeLineLocationOnCustomViewY(MAX_DEGREE), 50, computeLineLocationOnCustomViewY(MAX_DEGREE), ((twoDPlaneLength*4)+50), redPaint);
+        canvas.drawLine(computeLineLocationOnCustomViewY(MIN_DEGREE), 50, computeLineLocationOnCustomViewY(MIN_DEGREE), ((twoDPlaneLength*4)+50), redPaint);
 
         canvas.drawLine(twoDPlaneLength, computeLineLocationOnCustomViewX(MAX_DEGREE),  ((twoDPlaneLength*4)+twoDPlaneLength), computeLineLocationOnCustomViewX(MAX_DEGREE), redPaint);
         canvas.drawLine(twoDPlaneLength, computeLineLocationOnCustomViewX(MIN_DEGREE),  ((twoDPlaneLength*4)+twoDPlaneLength), computeLineLocationOnCustomViewX(MIN_DEGREE), redPaint);
@@ -164,7 +194,7 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     }
 
     private int computeLineLocationOnCustomViewX(double angle){
-        Double value =  ( - angle + 180d) * 2.1d;
+        Double value =  ( - angle + 190d) * 2.1d;
         return value.intValue();
     }
 

@@ -109,12 +109,13 @@ public class OneDCustomView extends View implements SensorEventListener {
 
         oneDRectanglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         oneDRectanglePaint.setStyle(Paint.Style.FILL);
-        oneDRectanglePaint.setColor(Color.YELLOW);
+        oneDRectanglePaint.setColor(Color.BLACK);
 
         redPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        redPaint.setColor(this.getResources().getColor(R.color.design_default_color_error));
+        redPaint.setColor(Color.RED);
         redPaint.setTextAlign(Paint.Align.CENTER);
         redPaint.setTextSize(50f);
+        redPaint.setStrokeWidth(getContext().getResources().getDisplayMetrics().density * 2);
         redPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
         bubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
