@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout customViewLinearLayout, informationLinearLayout;
     TextView oneDMinValue, oneDMaxValue,twoDMinXValue, twoDMaxXValue, twoDMinYValue, twoDMaxYValue;
+    ImageView imageViewAntiClockwiseRotation, imageViewClockwiseRotation;
 
     String screenOrientation;
 
@@ -118,6 +121,23 @@ public class MainActivity extends AppCompatActivity {
         twoDMaxXValue.setText(twoDXMax);
         twoDMinYValue.setText(twoDYMin);
         twoDMaxYValue.setText(twoDYMax);
+
+        imageViewAntiClockwiseRotation = (ImageView) findViewById(R.id.imageViewAntiClockwiseRotation);
+        imageViewClockwiseRotation = (ImageView) findViewById(R.id.imageViewClockwiseRotation);
+
+        imageViewAntiClockwiseRotation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                twoDCustomView.rotateCoordinateDirection(-15);
+            }
+        });
+
+        imageViewClockwiseRotation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                twoDCustomView.rotateCoordinateDirection(15);
+            }
+        });
 
         timer = new Timer();
         updateInformationOnUIComponents();

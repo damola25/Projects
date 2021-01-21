@@ -159,8 +159,6 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-//        canvas.drawRect(twoDRectangle, twoDRectanglePaint);
-
         int radius = (Integer)(((twoDPlaneLength*4))/2);
         canvas.drawCircle((twoDPlaneLength+radius), (50+radius), radius, twoDRectanglePaint);
         canvas.save();
@@ -302,5 +300,13 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         maxXValue = -10000d;
         minYValue = 10000d;
         maxYValue = -10000d;
+    }
+
+    public void rotateCoordinateDirection(int angularAdjustment) {
+        rotationAngle += angularAdjustment;
+        if (rotationAngle >= 360) {
+            rotationAngle = 0;
+        }
+        invalidate();
     }
 }
