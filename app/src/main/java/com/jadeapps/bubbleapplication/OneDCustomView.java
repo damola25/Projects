@@ -45,7 +45,7 @@ public class OneDCustomView extends View implements SensorEventListener {
     private Paint oneDRectanglePaint;
     private Bitmap oneDRectangleBitmap;
 
-    private double angleInDegreesXAxis, angleInDegreesYAxis;
+    private double angleInDegreesXAxis, angleInDegreesYAxis, minXValue, maxXValue;
 
     private Integer oneDPlaneLength;
 
@@ -77,6 +77,9 @@ public class OneDCustomView extends View implements SensorEventListener {
             oneDRectangleWidth = width - padX2;
             xPadWidth =  ((Integer) ((width - oneDRectangleWidth)/2));
         }
+
+        minXValue = 10000d;
+        maxXValue = -10000d;
 
         oneDRectangleHeight = 100;
 
@@ -157,6 +160,24 @@ public class OneDCustomView extends View implements SensorEventListener {
         canvas.drawCircle(computeLineLocationOnCustomView(angleInDegreesYAxis), (((Integer)(oneDRectangleHeight/2))+padY), (oneDRectangleHeight/3), bubblePaint);
     }
 
+    public double getMinXValue() {
+        for (int i=0; i<accelerometerSensorDataLogger.length; i++) {
+            if (accelerometerSensorDataLogger[i].values[0] < minXValue) {
+                minXValue = accelerometerSensorDataLogger[i].values[0];
+            }
+        }
+        return minXValue;
+    }
+
+    public double getMaxXValue() {
+        for (int i=0; i<accelerometerSensorDataLogger.length; i++) {
+            if (accelerometerSensorDataLogger[i].values[0] > maxXValue) {
+                maxXValue = accelerometerSensorDataLogger[i].values[0];
+            }
+        }
+        return maxXValue;
+    }
+
     private int computeLineLocationOnCustomView(double angle){
         Double value =  ( - angle + 260d) * 2.1d;
         return value.intValue();
@@ -218,5 +239,10 @@ public class OneDCustomView extends View implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    public void reset() {
+        minXValue = 10000d;
+        maxXValue = -10000d;
     }
 }

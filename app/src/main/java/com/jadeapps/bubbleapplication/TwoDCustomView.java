@@ -45,7 +45,7 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     private Paint twoDRectanglePaint;
     private Bitmap twoDRectangleBitmap;
 
-    private double angleInDegreesXAxis, angleInDegreesYAxis;
+    private double angleInDegreesXAxis, angleInDegreesYAxis, minXValue, maxXValue, minYValue, maxYValue;
 
     private Integer twoDPlaneLength;
 
@@ -121,6 +121,11 @@ public class TwoDCustomView extends View implements SensorEventListener  {
 
         angleInDegreesXAxis = 0d;
         angleInDegreesYAxis = 0d;
+
+        minXValue = 10000d;
+        maxXValue = -10000d;
+        minYValue = 10000d;
+        maxYValue = -10000d;
     }
 
     @Override
@@ -190,6 +195,42 @@ public class TwoDCustomView extends View implements SensorEventListener  {
         invalidate();
     }
 
+    public double getMinXValue() {
+        for (int i=0; i<accelerometerSensorDataLogger.length; i++) {
+            if (accelerometerSensorDataLogger[i].values[0] < minXValue) {
+                minXValue = accelerometerSensorDataLogger[i].values[0];
+            }
+        }
+        return minXValue;
+    }
+
+    public double getMaxXValue() {
+        for (int i=0; i<accelerometerSensorDataLogger.length; i++) {
+            if (accelerometerSensorDataLogger[i].values[0] > maxXValue) {
+                maxXValue = accelerometerSensorDataLogger[i].values[0];
+            }
+        }
+        return maxXValue;
+    }
+
+    public double getMinYValue() {
+        for (int i=0; i<accelerometerSensorDataLogger.length; i++) {
+            if (accelerometerSensorDataLogger[i].values[1] < minYValue) {
+                minYValue = accelerometerSensorDataLogger[i].values[1];
+            }
+        }
+        return minYValue;
+    }
+
+    public double getMaxYValue() {
+        for (int i=0; i<accelerometerSensorDataLogger.length; i++) {
+            if (accelerometerSensorDataLogger[i].values[1] > maxYValue) {
+                maxYValue = accelerometerSensorDataLogger[i].values[1];
+            }
+        }
+        return maxYValue;
+    }
+
     private SensorEvent[] updateSensorDataLoggerInstance(int loggerLength, SensorEvent[] selectedSensorDataLogger, SensorEvent event) {
         if (loggerLength >= 500) {
             return updateSensorDataByShiftOperations(selectedSensorDataLogger, event);
@@ -224,5 +265,12 @@ public class TwoDCustomView extends View implements SensorEventListener  {
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    public void reset() {
+        minXValue = 10000d;
+        maxXValue = -10000d;
+        minYValue = 10000d;
+        maxYValue = -10000d;
     }
 }
